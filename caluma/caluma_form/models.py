@@ -538,7 +538,7 @@ class Answer(core_models.BaseModel):
 
     @property
     def selected_options(self):
-        map = {
+        map_ = {
             Question.TYPE_CHOICE: (Option, {"slug": self.value}),
             Question.TYPE_MULTIPLE_CHOICE: (Option, {"slug__in": self.value}),
             Question.TYPE_DYNAMIC_CHOICE: (
@@ -559,13 +559,13 @@ class Answer(core_models.BaseModel):
             ),
         }
 
-        if self.question.type not in map:
+        if self.question.type not in map_:
             return None
 
         if not self.value:
             return []
 
-        model, filters = map[self.question.type]
+        model, filters = map_[self.question.type]
         queryset = model.objects.filter(**filters)
 
         def index_from_value(obj):
