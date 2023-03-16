@@ -15,7 +15,7 @@ def save_answer(
     """
     Save an answer for given question, document.
 
-    Similar to saveDocumentStringAnswer and the likes, it performes upsert.
+    Similar to saveDocumentStringAnswer and the likes, it performs upsert.
     :param value: Must match the question type
     """
 
@@ -37,7 +37,7 @@ def save_default_answer(
     """
     Save default_answer for given question.
 
-    Similar to saveDefaultStringAnswer and the likes, it performes upsert.
+    Similar to saveDefaultStringAnswer and the likes, it performs upsert.
     :param value: Must match the question type
     """
 
