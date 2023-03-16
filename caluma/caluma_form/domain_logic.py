@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Type
 
 from django.db import transaction
 from django.db.models import Q
@@ -14,7 +14,7 @@ from caluma.utils import update_model
 class BaseLogic:
     @staticmethod
     @transaction.atomic
-    def create(model: BaseModel, validated_data, user: Optional[BaseUser] = None):
+    def create(model: Type[BaseModel], validated_data, user: Optional[BaseUser] = None):
         if user:
             validated_data["created_by_user"] = user.username if user else None
             validated_data["created_by_group"] = user.group if user else None
