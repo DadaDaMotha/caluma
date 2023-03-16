@@ -12,6 +12,8 @@ from ..caluma_core.models import SlugModel, UUIDModel
 
 
 class Task(SlugModel):
+    """A single action that occurs in a business process."""
+
     TYPE_SIMPLE = "simple"
     TYPE_COMPLETE_WORKFLOW_FORM = "complete_workflow_form"
     TYPE_COMPLETE_TASK_FORM = "complete_task_form"
@@ -69,6 +71,12 @@ class Task(SlugModel):
 
 
 class Workflow(SlugModel):
+    """
+    Defines the structure of a business process.
+
+    It is built up of tasks which are connected by forward-referencing flows.
+    """
+
     name = LocalizedField(blank=False, null=False, required=False)
     description = LocalizedField(blank=True, null=True, required=False)
     meta = models.JSONField(default=dict)
@@ -96,10 +104,14 @@ class Workflow(SlugModel):
 
 
 class Flow(UUIDModel):
+    """Defines the ordering and dependencies between tasks."""
+
     next = models.TextField()
 
 
 class TaskFlow(UUIDModel):
+    """Binds the Workflow and Task together."""
+
     workflow = models.ForeignKey(
         Workflow, on_delete=models.CASCADE, related_name="task_flows"
     )
@@ -118,6 +130,8 @@ class TaskFlow(UUIDModel):
 
 
 class Case(UUIDModel):
+    """Designates is a specific instance of a workflow."""
+
     STATUS_RUNNING = "running"
     STATUS_COMPLETED = "completed"
     STATUS_CANCELED = "canceled"
@@ -175,6 +189,8 @@ def set_case_family(sender, instance, **kwargs):
 
 
 class WorkItem(UUIDModel):
+    """A single unit of work that needs to be completed in a specific stage of a case."""
+
     STATUS_READY = "ready"
     STATUS_COMPLETED = "completed"
     STATUS_CANCELED = "canceled"
