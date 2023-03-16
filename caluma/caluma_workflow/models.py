@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from datetime import timedelta
 
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
+from django.db.models import Manager
 from django.db.models.signals import post_init, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -58,6 +61,7 @@ class Task(SlugModel):
         default=False,
         help_text="Whether to continue the flow if the multiple instance work item has ready siblings",
     )
+    task_flows: Manager[TaskFlow]
 
     def calculate_deadline(self):
         if self.lead_time is not None:
@@ -86,6 +90,7 @@ class Workflow(SlugModel):
         related_name="workflows",
         blank=True,
     )
+    task_flows: Manager[TaskFlow]
 
     @property
     def flows(self):
@@ -97,6 +102,7 @@ class Workflow(SlugModel):
 
 class Flow(UUIDModel):
     next = models.TextField()
+    task_flows: Manager[Flow]
 
 
 class TaskFlow(UUIDModel):

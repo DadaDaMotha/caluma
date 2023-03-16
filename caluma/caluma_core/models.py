@@ -91,7 +91,7 @@ class UUIDModel(BaseModel, HistoricalModel):
 class NaturalKeyModel(BaseModel, HistoricalModel):
     """Models which use a natural key as primary key."""
 
-    id = models.CharField(max_length=255, unique=True, primary_key=True)
+    id: str = models.CharField(max_length=255, unique=True, primary_key=True)
 
     def natural_key(self):  # pragma: no cover
         raise NotImplementedError()

@@ -4,12 +4,14 @@ from functools import wraps
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models, transaction
+from django.db.models import Manager
 from django.utils.functional import cached_property
 from localized_fields.fields import LocalizedField, LocalizedTextField
 from minio import S3Error
 from simple_history.models import HistoricalRecords
 
 from ..caluma_core import models as core_models
+from ..caluma_workflow.models import Task
 from .storage_clients import client
 
 
@@ -30,6 +32,7 @@ class Form(core_models.SlugModel):
         related_name="+",
         on_delete=models.SET_NULL,
     )
+    tasks: Manager[Task]
 
     @classmethod
     def _get_all_raw_forms(cls, forms: list):
@@ -71,6 +74,8 @@ class Form(core_models.SlugModel):
 
 
 class FormQuestion(core_models.NaturalKeyModel):
+    form_id: str | None
+    question_id: str | None
     form = models.ForeignKey("Form", on_delete=models.CASCADE)
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
     sort = models.PositiveIntegerField(editable=False, db_index=True, default=0)
@@ -187,6 +192,7 @@ class Question(core_models.SlugModel):
     calc_dependents = ArrayField(
         models.CharField(max_length=255, blank=True), default=list
     )
+    answers: Manager["Answer"]
 
     @property
     def min_length(self):
@@ -263,6 +269,8 @@ class Question(core_models.SlugModel):
 
 
 class QuestionOption(core_models.NaturalKeyModel):
+    question_id: str
+    option_id: str
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
     option = models.ForeignKey("Option", on_delete=models.CASCADE)
     sort = models.PositiveIntegerField(editable=False, db_index=True, default=0)
@@ -325,6 +333,7 @@ class Document(core_models.UUIDModel):
         on_delete=models.SET_NULL,
     )
     meta = models.JSONField(default=dict)
+    answers: Manager["Answer"]
 
     def set_family(self, root_doc):
         """Set the family to the given root_doc.
@@ -450,6 +459,8 @@ class Answer(core_models.BaseModel):
         history_user_getter=core_models._history_user_getter,
         bases=[QuestionTypeHistoricalModel],
     )
+
+    files: Manager["File"]
 
     def delete(self, *args, **kwargs):
         # Files need to be deleted in sequence (not via on_delete)
